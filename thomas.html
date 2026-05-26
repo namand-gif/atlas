@@ -1,0 +1,1590 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<title>Thomas Lighting</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@400;500;600;700&family=Inter:wght@300;400;500;600;700&family=Pinyon+Script&display=swap" rel="stylesheet">
+<style>
+  /* ===========================================================
+     CHANGE REGISTRY (from Atlas & Thomas.xlsx)
+     #1  gray/white palette for Atlas         -> tokens
+     #4  font unified Atlas & Thomas          -> Inter + Cormorant
+     #5  brand switcher -> dropdown, only alt -> .brand-switcher
+     #6  remove social links from header      -> header has none
+     #7  mobile menu w/ logo below brand      -> .m-drawer
+     #9  hero box moved to BOTTOM of image    -> .hero-card.is-bottom
+     #12 category img within box + shading    -> .cat-tile img object-fit
+     #13 rename "Explore Category" -> "Featured Collections" (Atlas)
+     #14 Shop Now smaller than collection name-> .cat-tile .shop-now
+     #15 remove "Lighting" microtext on cards -> no .pcard__eyebrow-lighting
+     #16 4 products desktop / 2 mobile        -> .featured-grid
+     #17 6 featured collections for Atlas     -> 6 .cat-tile items
+     #18 collage Lighting LEFT, F+D RIGHT     -> .collage layout
+     #19 footer "Opportunity Buys" -> Clearance URL
+     #20 "Tools + Resources" -> "Resources"
+     #24 finish & material concat (not size)  -> .pcard__meta
+     #25 no price + no "unlock price" sticker -> .pcard has no .price block
+     =========================================================== */
+
+  :root{
+    /* #1 Atlas palette = gray/white, no blue */
+    --bg:           #FFFFFF;
+    --surface:      #FAFAF8;
+    --surface-2:    #F3F2EE;
+    --hair:         #E5E5E2;
+    --text:         #1F1F1F;
+    --text-2:       #4A4A4A;
+    --text-3:       #777777;
+    --accent:       #2C2C2C;   /* deep charcoal — Atlas brand */
+    --accent-soft:  #585858;
+    --line:         #D9D8D3;
+    --ok:           #2F7D52;
+    /* #4 Type stack unified Atlas + Thomas */
+    --f-sans: 'Inter', system-ui, -apple-system, Segoe UI, Roboto, sans-serif;
+    --f-serif:'Cormorant Garamond', Georgia, serif;
+    --f-script:'Pinyon Script', cursive;
+    --r-card: 6px;
+    --r-pill: 999px;
+    --t-fast: .18s ease;
+    --t-med:  .28s ease;
+    --shadow-soft: 0 2px 14px rgba(0,0,0,.06);
+    --shadow-card: 0 4px 22px rgba(0,0,0,.08);
+  }
+
+  *{box-sizing:border-box}
+  html,body{margin:0;padding:0}
+  body{
+    font-family:var(--f-sans);
+    color:var(--text);
+    background:var(--bg);
+    font-size:16px;
+    line-height:1.55;
+    -webkit-font-smoothing:antialiased;
+  }
+  img{max-width:100%;display:block}
+  a{color:inherit;text-decoration:none}
+  button{font-family:inherit;cursor:pointer;border:none;background:none}
+  h1,h2,h3,h4{font-family:var(--f-serif);font-weight:500;letter-spacing:.01em;margin:0}
+  .wrap{max-width:1320px;margin:0 auto;padding:0 28px}
+  @media (max-width:760px){ .wrap{padding:0 18px} }
+
+  /* ============ ANNOUNCEMENT BAR ============ */
+  .anno{
+    background:var(--accent);color:#fff;
+    text-align:center;font-size:13px;letter-spacing:.08em;
+    padding:9px 12px;text-transform:uppercase;
+  }
+  .anno a{text-decoration:underline;text-underline-offset:3px}
+
+  /* ============ Inline SEARCH OVERLAY (opens when search icon clicked) ============ */
+  .search-overlay{
+    position:fixed;top:0;left:0;right:0;
+    background:#fff;
+    border-bottom:1px solid var(--hair);
+    box-shadow:0 4px 14px rgba(0,0,0,.06);
+    z-index:60;
+    transform:translateY(-110%);
+    transition:transform .25s ease;
+    padding:18px 28px;
+  }
+  .search-overlay.is-open{transform:translateY(0)}
+  .search-bar{
+    display:flex;align-items:center;gap:14px;
+    max-width:1100px;margin:0 auto;
+  }
+  .search-input-wrap{
+    flex:1;display:flex;align-items:center;
+    border:1px solid var(--hair);border-radius:4px;
+    background:#fff;padding:0 8px 0 14px;
+    height:48px;
+  }
+  .search-input-wrap .si-mag{
+    width:20px;height:20px;color:var(--text-3);flex-shrink:0;
+  }
+  .search-input-wrap input{
+    flex:1;border:0;outline:none;
+    padding:0 8px;font-size:15px;color:var(--text);
+    font-family:inherit;background:transparent;
+    min-width:0;
+  }
+  .search-input-wrap input::placeholder{color:var(--text-3)}
+  .search-by-image{
+    width:38px;height:38px;border-radius:4px;
+    display:inline-flex;align-items:center;justify-content:center;
+    background:transparent;border:0;color:var(--text-2);
+    cursor:pointer;transition:background var(--t-fast);
+  }
+  .search-by-image:hover{background:var(--surface-2);color:var(--text)}
+  .search-by-image svg{width:20px;height:20px}
+  .search-close{
+    width:36px;height:36px;flex-shrink:0;
+    display:inline-flex;align-items:center;justify-content:center;
+    background:transparent;color:var(--text);font-size:24px;
+    cursor:pointer;
+  }
+  .search-close svg{width:22px;height:22px}
+
+  /* ============ HEADER — 3-tier layout per client screenshot ============ */
+  header.site-header{
+    background:#f6f6f6;
+    border-bottom:1px solid var(--hair);
+    position:sticky;top:0;z-index:50;
+    box-shadow:0 1px 0 rgba(0,0,0,.02);
+  }
+
+  /* TIER 1 — top strip with small Atlas + Thomas brand badges (like screenshot) */
+  .hdr-top-strip{
+    border-bottom:1px solid var(--hair);
+    background:#f6f6f6;
+  }
+  .hdr-top-strip .wrap{
+    display:flex;align-items:center;gap:18px;
+    padding:14px 28px;       /* empty strip — keeps spacing without content */
+    min-height:24px;
+  }
+  .hdr-mini-logo-box{
+    display:inline-flex;flex-direction:column;align-items:center;justify-content:center;
+    border:1px solid var(--hair);background:#fff;
+    padding:6px 18px;border-radius:2px;line-height:1;
+  }
+  .hdr-mini-logo-box .script{font-family:var(--f-script);font-size:30px;color:var(--accent);line-height:.9}
+  .hdr-mini-logo-box .sub{font-family:var(--f-sans);font-weight:700;font-size:9px;letter-spacing:.22em;color:var(--accent);margin-top:2px}
+  .hdr-mini-logo-box .tag{font-size:7px;letter-spacing:.18em;color:var(--text-3);margin-top:2px;text-transform:uppercase}
+  .hdr-thomas-mini{
+    display:inline-flex;align-items:center;gap:8px;
+    padding:6px 14px;color:#3678BF;
+  }
+  .hdr-thomas-mini .t-mark{
+    width:34px;height:34px;background:#3678BF;border-radius:2px;
+    display:inline-flex;align-items:center;justify-content:center;
+  }
+  .hdr-thomas-mini .t-mark svg{width:24px;height:24px}
+  .hdr-thomas-mini .t-label{font-family:var(--f-sans);font-weight:700;font-size:14px;letter-spacing:.18em;color:#3678BF}
+
+  /* TIER 2 — main header row */
+  .hdr-row{
+    display:grid;
+    grid-template-columns: 1fr auto 1fr;
+    align-items:center;
+    gap:24px;
+    padding:20px 0;
+  }
+  .hdr-left{display:flex;align-items:center;gap:14px;justify-content:flex-start}
+  .hdr-right{display:flex;align-items:center;gap:8px;justify-content:flex-end}
+
+  /* Thomas brand-switcher pill on the LEFT (replaces social icons) */
+  .hdr-brand-pill{
+    display:inline-flex;align-items:center;gap:10px;
+    padding:8px 16px;border:1px solid var(--hair);border-radius:var(--r-pill);
+    background:#fff;color:#3678BF;
+    font-size:13px;font-weight:600;letter-spacing:.06em;
+    transition:all var(--t-fast);
+  }
+  .hdr-brand-pill:hover{border-color:#3678BF;background:#f4f9ff}
+  .hdr-brand-pill .t-mark{
+    width:22px;height:22px;background:#3678BF;border-radius:2px;
+    display:inline-flex;align-items:center;justify-content:center;
+  }
+  .hdr-brand-pill .t-mark svg{width:16px;height:16px}
+
+  /* TIER 3 — bottom nav row with Thomas pill on LEFT and nav centered */
+  .hdr-nav{
+    border-top:1px solid var(--hair);
+    background:#f6f6f6;
+  }
+  .hdr-nav .wrap{
+    display:flex;align-items:center;justify-content:space-between;
+    padding:12px 28px;gap:18px;
+  }
+  /* Spacer mirrors the pill width so the centered nav stays visually centered */
+  .hdr-nav-spacer{width:178px;display:inline-block}
+  .hdr-brand-pill--nav{margin:0}
+  /* Thomas brand logo in header — enlarged per client request */
+  .hdr-logo--image{display:flex;align-items:center;justify-content:center;line-height:0}
+  .hdr-logo--image img{height:130px;width:auto;display:block}
+  @media (max-width:900px){
+    .hdr-logo--image img{height:76px}
+  }
+  /* Atlas-variant pill (used on Thomas site) — charcoal accent */
+  .hdr-brand-pill--atlas{color:#2C2C2C}
+  .hdr-brand-pill--atlas:hover{border-color:#2C2C2C;background:#f6f4f0}
+  .hdr-brand-pill--atlas .t-mark--atlas{
+    width:22px;height:22px;background:#2C2C2C;color:#fff;border-radius:2px;
+    display:inline-flex;align-items:center;justify-content:center;
+    font-family:var(--f-script);font-size:18px;line-height:1;padding-bottom:2px;
+  }
+  .hdr-logo{
+    text-align:center;
+    display:flex;flex-direction:column;align-items:center;justify-content:center;
+    line-height:1;
+  }
+  .hdr-logo .script{
+    font-family:var(--f-script);
+    font-size:54px;
+    color:var(--accent);
+    line-height:.9;
+  }
+  .hdr-logo .sub{
+    font-family:var(--f-sans);
+    font-weight:600;font-size:13px;
+    letter-spacing:.32em;color:var(--accent);
+    margin-top:2px;
+  }
+  .hdr-logo .tag{
+    font-size:10px;letter-spacing:.22em;color:var(--text-3);
+    margin-top:2px;text-transform:uppercase;
+  }
+
+  /* Nav links */
+  .nav{display:flex;align-items:center;gap:26px}
+  .nav > a,
+  .nav > .nav-item > a{
+    font-size:15px;font-weight:500;color:var(--text);
+    padding:8px 0;border-bottom:2px solid transparent;
+    transition:border-color var(--t-fast);
+    display:inline-flex;align-items:center;gap:6px;
+  }
+  .nav > a:hover,
+  .nav > .nav-item > a:hover{border-bottom-color:var(--accent)}
+
+  /* Dropdown menus on nav items */
+  .nav-item{position:relative}
+  .nav-item .chev{width:11px;height:11px}
+  .nav-item .dropdown{
+    position:absolute;top:100%;left:0;
+    min-width:200px;
+    background:rgba(255,255,255,.55);
+    backdrop-filter:saturate(140%) blur(8px);
+    -webkit-backdrop-filter:saturate(140%) blur(8px);
+    border:1px solid rgba(229,229,226,.7);
+    box-shadow:0 6px 18px rgba(0,0,0,.08);
+    padding:8px 0;
+    opacity:0;visibility:hidden;
+    transform:translateY(-6px);
+    transition:opacity .2s ease, visibility .2s ease, transform .2s ease;
+    z-index:60;
+  }
+  .nav-item:hover .dropdown,
+  .nav-item:focus-within .dropdown{
+    opacity:1;visibility:visible;transform:translateY(0);
+  }
+  .nav-item .dropdown a{
+    display:block;padding:10px 22px;
+    font-size:14px;font-weight:500;color:var(--text);
+    border-bottom:0;letter-spacing:0;text-transform:none;
+    transition:background var(--t-fast);
+  }
+  .nav-item .dropdown a:hover{background:rgba(243,242,238,.7);border-bottom-color:transparent}
+
+  .icon-btn{
+    width:44px;height:44px;border-radius:999px;
+    display:inline-flex;align-items:center;justify-content:center;
+    color:var(--text);transition:background var(--t-fast);
+    position:relative;
+  }
+  .icon-btn:hover{background:var(--surface-2)}
+  .icon-btn svg{width:22px;height:22px}
+  .cart-badge{
+    position:absolute;top:6px;right:6px;
+    background:var(--accent);color:#fff;font-size:11px;
+    min-width:18px;height:18px;border-radius:999px;
+    display:none;align-items:center;justify-content:center;padding:0 5px;
+    font-weight:600;
+  }
+  body.is-logged-in .cart-badge{display:inline-flex}
+
+  /* Legacy brand-switcher dropdown (replaced by .hdr-brand-pill — kept hidden for safety) */
+  .brand-switcher{display:none;position:relative;margin-right:6px}
+  .brand-switcher__btn{
+    display:inline-flex;align-items:center;gap:6px;
+    padding:8px 14px;border:1px solid var(--hair);
+    border-radius:var(--r-pill);
+    font-size:13px;font-weight:600;letter-spacing:.04em;
+    color:var(--text-2);background:#fff;
+    transition:all var(--t-fast);
+    min-height:40px;
+  }
+  .brand-switcher__btn:hover{border-color:var(--accent);color:var(--accent)}
+  .brand-switcher__btn svg{width:14px;height:14px}
+  .brand-switcher__menu{
+    position:absolute;top:calc(100% + 8px);right:0;
+    background:#fff;border:1px solid var(--hair);
+    border-radius:var(--r-card);
+    box-shadow:var(--shadow-card);
+    min-width:280px;padding:10px;
+    display:none;z-index:60;
+  }
+  .brand-switcher.is-open .brand-switcher__menu{display:block}
+  .brand-switcher__menu a{
+    display:flex;align-items:center;gap:14px;
+    padding:12px 14px;border-radius:4px;
+  }
+  .brand-switcher__menu a:hover{background:var(--surface-2)}
+  .brand-switcher__menu .mini-logo{
+    width:84px;height:38px;background:#fff;
+    display:flex;align-items:center;justify-content:center;
+    border:1px solid var(--hair);border-radius:4px;
+  }
+  .brand-switcher__menu .alt-meta{font-size:13px;color:var(--text-2)}
+  .brand-switcher__menu .alt-meta b{display:block;color:var(--text);font-size:14px;letter-spacing:.04em}
+
+  .hamburger{display:none}
+  @media (max-width:900px){
+    .nav{display:none}
+    .hamburger{display:inline-flex}
+    .brand-switcher{display:none}
+    .hdr-brand-pill{display:none}
+    .hdr-top-strip{display:none}      /* hide top brand strip on mobile */
+    .hdr-nav{display:none}             /* mobile uses hamburger menu */
+    .hdr-row{grid-template-columns: auto 1fr auto; gap:14px}
+    .hdr-logo .script{font-size:40px}
+    .hdr-logo .sub{font-size:11px;letter-spacing:.28em}
+    .hdr-logo .tag{display:none}
+    .icon-btn[data-mobile-hide]{display:none}
+  }
+
+  /* ============ HERO (#9 banner box at BOTTOM) ============ */
+  .hero{background:var(--surface);padding:0}
+  .hero-slider{position:relative;overflow:hidden}
+  .hero-track{display:flex;transition:transform .6s cubic-bezier(.22,.61,.36,1)}
+  .hero-slide{
+    flex:0 0 100%;
+    position:relative;
+    aspect-ratio: 16/7;
+    overflow:hidden;
+  }
+  .hero-slide__img{position:absolute;inset:0;background-position:center;background-size:cover}
+  /* Client-supplied chandelier image — used for all three hero slides */
+  .hero-slide:nth-child(1) .hero-slide__img,
+  .hero-slide:nth-child(2) .hero-slide__img,
+  .hero-slide:nth-child(3) .hero-slide__img{
+    background-image:
+      linear-gradient(0deg, rgba(0,0,0,.18), rgba(0,0,0,.05)),
+      url('assets/hero-chandelier.png');
+    background-position:center;
+    background-size:cover;
+  }
+  /* Decorative SVG overlay hidden — real chandelier images now in use */
+  .hero-slide__deco{display:none}
+  .hero-slide:nth-child(1) .hero-slide__deco{
+    background-image:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 400 600'><g fill='none' stroke='%23fff' stroke-width='1.2' opacity='0.85'><line x1='200' y1='0' x2='200' y2='90'/><circle cx='200' cy='110' r='14' fill='%23fff' opacity='0.4'/><line x1='200' y1='124' x2='200' y2='200'/><ellipse cx='200' cy='240' rx='90' ry='14' fill='%23fff' opacity='0.4'/><line x1='115' y1='245' x2='115' y2='300'/><circle cx='115' cy='320' r='24' fill='%23fff' opacity='0.55'/><line x1='200' y1='245' x2='200' y2='320'/><circle cx='200' cy='340' r='24' fill='%23fff' opacity='0.55'/><line x1='285' y1='245' x2='285' y2='300'/><circle cx='285' cy='320' r='24' fill='%23fff' opacity='0.55'/></g></svg>");
+  }
+  .hero-slide:nth-child(2) .hero-slide__deco{
+    background-image:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 400 600'><g fill='none' stroke='%23fff' stroke-width='1.4' opacity='0.85'><line x1='200' y1='0' x2='200' y2='160'/><rect x='160' y='160' width='80' height='190' rx='4' fill='%23fff' opacity='0.42'/><line x1='200' y1='360' x2='200' y2='420'/><rect x='100' y='420' width='200' height='10' fill='%23fff' opacity='0.5'/></g></svg>");
+  }
+  .hero-slide:nth-child(3) .hero-slide__deco{
+    background-image:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 400 600'><g fill='none' stroke='%23fff' stroke-width='1.3' opacity='0.85'><line x1='200' y1='0' x2='200' y2='120'/><polygon points='160,120 240,120 220,360 180,360' fill='%23fff' opacity='0.45'/><line x1='200' y1='360' x2='200' y2='430'/><ellipse cx='200' cy='450' rx='40' ry='10' fill='%23fff' opacity='0.4'/></g></svg>");
+  }
+
+  /* Banner box — full-width strip with THREE EQUAL columns (title | body | button) */
+  .hero-card{
+    position:absolute;
+    left:0;right:0;bottom:0;
+    top:auto;transform:none;
+    max-width:none;
+    background:rgba(255,255,255,.88);
+    backdrop-filter:saturate(140%) blur(6px);
+    padding:24px clamp(20px,4vw,56px);
+    border-left:0;
+    box-shadow:0 -2px 14px rgba(0,0,0,.06);
+    display:grid;
+    grid-template-columns: 1fr 1fr 1fr;
+    align-items:center;
+    gap:clamp(20px,3vw,40px);
+  }
+  .hero-card__eyebrow{display:none}
+  .hero-card__title{
+    font-family:var(--f-serif);
+    font-size:clamp(26px,3vw,40px);
+    line-height:1.0;color:#111;
+    text-transform:uppercase;letter-spacing:.02em;
+    margin:0;
+    font-weight:700;
+    max-width:none;
+  }
+  .hero-card__body{
+    font-size:15px;color:#2a2a2a;margin:0;
+    max-width:none;line-height:1.45;
+  }
+  .hero-card .btn{
+    margin:0;padding:14px 36px;
+    white-space:nowrap;
+    justify-self:end;
+    margin-right:clamp(40px,6vw,100px);   /* pull button leftward from the right edge */
+    min-width:180px;                       /* widen so it stretches a bit to the left */
+    text-align:center;
+  }
+  .btn{
+    display:inline-flex;align-items:center;gap:8px;
+    padding:13px 26px;
+    background:var(--accent);color:#fff;
+    border:1px solid var(--accent);
+    font-size:14px;font-weight:600;letter-spacing:.14em;
+    text-transform:uppercase;
+    transition:all var(--t-fast);
+    border-radius:2px;
+    min-height:48px;
+  }
+  .btn:hover{background:#000;border-color:#000}
+
+  .hero-arrow{
+    position:absolute;top:50%;transform:translateY(-50%);
+    width:48px;height:48px;border-radius:999px;
+    background:rgba(255,255,255,.85);color:var(--text);
+    display:flex;align-items:center;justify-content:center;
+    z-index:3;transition:all var(--t-fast);
+  }
+  .hero-arrow:hover{background:#fff}
+  .hero-arrow.prev{left:18px}
+  .hero-arrow.next{right:18px}
+  .hero-dots{
+    position:absolute;left:50%;transform:translateX(-50%);
+    bottom:14px;display:flex;gap:8px;z-index:3;
+  }
+  .hero-dots button{
+    width:9px;height:9px;border-radius:999px;
+    background:rgba(255,255,255,.55);border:1px solid rgba(0,0,0,.1);
+    cursor:pointer;
+  }
+  .hero-dots button.active{background:var(--accent);width:24px}
+  .hero-pause{
+    position:absolute;right:18px;top:18px;z-index:3;
+    width:38px;height:38px;border-radius:999px;
+    background:rgba(255,255,255,.85);color:var(--text);
+    display:flex;align-items:center;justify-content:center;
+  }
+  @media (max-width:760px){
+    .hero-slide{aspect-ratio: 4/5}
+    .hero-card{left:0;right:0;bottom:0;padding:18px 20px;grid-template-columns:1fr;align-items:start;gap:12px}
+    .hero-card__title{max-width:none}
+    .hero-card .btn{justify-self:stretch;text-align:center;justify-content:center}
+    .hero-arrow{display:none}
+  }
+
+  /* ============ SECTION HEADER ============ */
+  .sec{padding:72px 0}
+  /* Featured Collections + Featured Products section backgrounds (client request) */
+  #fc, #products{background:#dddddd !important}
+  .sec-head{text-align:center;margin-bottom:36px}
+  .sec-head .eyebrow{
+    font-size:11px;letter-spacing:.36em;
+    color:var(--text-3);text-transform:uppercase;
+  }
+  .sec-head h2{
+    font-size:clamp(28px,3vw,38px);
+    color:var(--accent);
+    margin-top:8px;letter-spacing:.02em;
+  }
+  .sec-head p{
+    margin:14px auto 0;max-width:560px;
+    color:var(--text-2);font-size:15.5px;
+  }
+
+  /* ============ FEATURED COLLECTIONS — horizontal card layout per screenshot ============ */
+  .fc-grid{
+    display:grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap:24px;
+  }
+  @media (max-width:1100px){ .fc-grid{grid-template-columns: repeat(2, 1fr)} }
+  @media (max-width:560px){ .fc-grid{grid-template-columns: 1fr} }
+
+  .cat-tile{
+    position:relative;
+    background:#F3F1ED;
+    border:1px solid #E8E5DE;
+    border-radius:6px;
+    overflow:hidden;
+    display:grid;
+    grid-template-columns: 1fr auto;
+    align-items:center;
+    min-height:150px;            /* reduced size */
+    transition:transform var(--t-med), box-shadow var(--t-med);
+  }
+  .cat-tile:hover{transform:translateY(-3px);box-shadow:var(--shadow-card)}
+
+  .cat-tile__body{
+    padding:20px 18px;
+    text-align:left;
+    background:transparent;
+    border-top:0;
+  }
+  .cat-tile__eyebrow{
+    font-family:var(--f-sans);
+    font-size:11px;letter-spacing:.22em;text-transform:uppercase;
+    color:#B5A47A;                /* soft tan/gold per screenshot */
+    font-weight:600;
+    margin:0 0 10px;
+  }
+  .cat-tile__title{
+    font-family:var(--f-sans);
+    font-size:18px;line-height:1.2;
+    color:#1F1F1F;
+    margin:0 0 14px;
+    letter-spacing:.04em;
+    font-weight:700;
+    text-transform:uppercase;
+  }
+  .cat-tile .shop-now{
+    display:inline-flex;align-items:center;gap:8px;
+    font-size:13px;
+    letter-spacing:.02em;text-transform:none;
+    color:#1F1F1F;font-weight:500;
+    padding:2px 0;
+    border-bottom:0;
+    transition:gap var(--t-fast);
+  }
+  .cat-tile:hover .shop-now{gap:14px}
+  .cat-tile .shop-now svg{width:14px;height:14px}
+
+  /* Image area — sits on the right, fully contained inside the card */
+  .cat-tile__media{
+    position:relative;
+    width:170px;
+    height:180px;
+    overflow:hidden;
+    background:transparent;
+    flex-shrink:0;
+  }
+  .cat-tile__media::after{display:none}    /* remove old vignette */
+  .cat-tile__media img,
+  .cat-tile__media svg{
+    position:absolute;inset:0;
+    width:100%;height:100%;
+    object-fit:contain;
+    object-position:center;
+    padding:14px;
+    transition:transform .4s ease;
+  }
+  .cat-tile:hover .cat-tile__media img,
+  .cat-tile:hover .cat-tile__media svg{transform:scale(1.04)}
+
+  @media (max-width:560px){
+    .cat-tile{grid-template-columns: 1fr 130px;min-height:150px}
+    .cat-tile__media{width:130px;height:150px}
+    .cat-tile__body{padding:20px 18px}
+  }
+
+  /* ===== Thomas-specific Featured Collections overrides — Title Case, no eyebrow, contained illustration ===== */
+  /* Remove "EXPLORE CATEGORY" eyebrow and "Shop Now" link from all 6 collection cards */
+  .cat-tile__eyebrow,
+  .cat-tile .shop-now{display:none !important}
+  .cat-tile__title{
+    font-family:var(--f-sans);
+    font-size:17px;line-height:1.2;     /* reduced */
+    color:#1F1F1F;
+    margin:0;
+    letter-spacing:.01em;
+    font-weight:700;
+    text-transform:none;
+  }
+  /* Make absolutely sure illustrations stay INSIDE the box */
+  .cat-tile{overflow:hidden}
+  .cat-tile__media{
+    width:150px;                        /* reduced */
+    height:150px;
+    overflow:hidden;
+  }
+  .cat-tile__media svg,
+  .cat-tile__media img{
+    position:absolute;inset:0;
+    width:100%;height:100%;
+    padding:10px;
+    object-fit:contain;
+    object-position:right center;   /* anchor product on right since crops have left whitespace */
+    overflow:hidden;
+  }
+
+  /* ============ FEATURED PRODUCTS (#15, #16, #24, #25) ============ */
+  .featured-grid{
+    display:grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap:24px;
+  }
+  @media (max-width:1100px){ .featured-grid{grid-template-columns: repeat(3, 1fr)} }
+  @media (max-width:760px){ .featured-grid{grid-template-columns: repeat(2, 1fr); gap:14px} }
+
+  .pcard{
+    position:relative;
+    background:#fff;
+    border:1px solid var(--hair);
+    border-radius:var(--r-card);
+    overflow:hidden;
+    display:flex;flex-direction:column;
+    transition:transform var(--t-med),box-shadow var(--t-med);
+  }
+  .pcard:hover{transform:translateY(-3px);box-shadow:var(--shadow-card)}
+  .pcard__media{
+    position:relative;
+    aspect-ratio:1/1;
+    background:radial-gradient(ellipse at 50% 60%, #fff 0%, #ebe7df 80%);
+    overflow:hidden;
+  }
+  .pcard__media svg,.pcard__media img{
+    position:absolute;inset:0;
+    width:100%;height:100%;
+    object-fit:contain;
+    padding:14px;
+  }
+  .pcard__wish{
+    position:absolute;top:10px;right:10px;z-index:2;
+    width:36px;height:36px;border-radius:999px;
+    background:rgba(255,255,255,.94);
+    display:flex;align-items:center;justify-content:center;
+  }
+  .pcard__wish svg{width:18px;height:18px;color:var(--text-2)}
+  .pcard__wish:hover svg{color:#c0392b}
+  .pcard__body{padding:14px 14px 16px;display:flex;flex-direction:column}
+  .pcard__sku{
+    font-size:11px;letter-spacing:.18em;
+    color:var(--text-3);text-transform:uppercase;
+    margin-bottom:6px;
+  }
+  .pcard__title{
+    font-family:var(--f-serif);
+    /* Full product names must be visible — no truncation, no min-height clamp */
+    font-size:19px;line-height:1.25;
+    color:var(--text);margin:0 0 10px;
+    overflow-wrap:break-word;
+    word-break:normal;
+    font-weight:500;
+  }
+  /* Meta line removed as clutter per client notes */
+  .pcard__meta{display:none}
+  /* #25 NO price area, NO "Unlock Price" / "Login to See Price" sticker for guests */
+  .pcard__price{display:none}
+  body.is-logged-in .pcard__price{
+    display:flex;align-items:baseline;gap:8px;
+    font-size:16px;font-weight:600;color:var(--accent);
+    margin-bottom:10px;
+  }
+  body.is-logged-in .pcard__price small{
+    font-size:12px;color:var(--text-3);font-weight:400;letter-spacing:.04em;
+  }
+  .pcard__cta{
+    display:flex;gap:8px;align-items:center;
+    margin-top:auto;
+  }
+  .pcard__add{
+    flex:1;
+    padding:10px 14px;font-size:12px;font-weight:600;
+    letter-spacing:.16em;text-transform:uppercase;
+    background:#fff;color:var(--accent);
+    border:1px solid var(--accent);
+    border-radius:2px;
+    transition:all var(--t-fast);
+    min-height:44px;
+  }
+  .pcard__add:hover{background:var(--accent);color:#fff}
+
+  /* ============ CATEGORY COLLAGE (#18) ============ */
+  .collage{
+    display:grid;
+    grid-template-columns: 1.4fr 1fr;
+    grid-template-rows: 1fr 1fr;
+    gap:18px;
+    min-height:520px;
+  }
+  .col-tile{
+    position:relative;
+    overflow:hidden;
+    border-radius:var(--r-card);
+    background:var(--surface);
+    border:1px solid var(--hair);
+    color:#fff;
+    display:block;
+  }
+  .col-tile .col-bg{
+    position:absolute;inset:0;
+    background-size:cover;background-position:center;
+    transition:transform .6s ease;
+  }
+  .col-tile:hover .col-bg{transform:scale(1.04)}
+  .col-tile::after{
+    content:"";position:absolute;inset:0;
+    /* Darker at top-left where label + SHOP NOW now sit */
+    background:linear-gradient(135deg, rgba(0,0,0,.45) 0%, rgba(0,0,0,.18) 45%, rgba(0,0,0,0) 75%);
+  }
+  .col-tile .col-overlay{
+    position:absolute;left:28px;bottom:24px;right:28px;z-index:2;
+  }
+  .col-tile .col-overlay h3{
+    font-size:30px;color:#fff;margin:0 0 10px;
+    letter-spacing:.03em;
+  }
+  .col-tile .col-overlay .shop-now{
+    display:inline-flex;align-items:center;gap:6px;
+    color:#fff;border-bottom:1px solid #fff;
+    font-size:12px;letter-spacing:.18em;font-weight:600;
+    padding:6px 0;text-transform:uppercase;
+  }
+  /* Lighting spans full LEFT column — real lifestyle image */
+  .col-lighting{ grid-column:1; grid-row:1 / span 2; }
+  .col-lighting .col-bg{
+    background-image:url('https://images.unsplash.com/photo-1513506003901-1e6a229e2d15?auto=format&fit=crop&w=1400&q=80');
+  }
+  /* Furniture & Decor stacked on the RIGHT */
+  .col-furniture{ grid-column:2; grid-row:1; }
+  .col-furniture .col-bg{
+    background-image:url('https://images.unsplash.com/photo-1556228453-efd6c1ff04f6?auto=format&fit=crop&w=1400&q=80');
+  }
+  .col-decor{ grid-column:2; grid-row:2; }
+  .col-decor .col-bg{
+    background-image:url('https://images.unsplash.com/photo-1493663284031-b7e3aefcae8e?auto=format&fit=crop&w=1400&q=80');
+  }
+
+  /* Overlay heading style updated to match screenshot — left-anchored, white SHOP NOW pill */
+  .col-tile .col-overlay h3{
+    font-family:var(--f-sans);
+    font-size:34px;color:#fff;margin:0 0 14px;
+    letter-spacing:.04em;font-weight:700;text-transform:uppercase;
+  }
+  .col-tile .col-overlay{
+    left:28px;bottom:auto;top:28px;right:auto;
+  }
+  .col-tile .shop-now-pill{
+    display:inline-block;
+    padding:9px 22px;background:#fff;color:#1F1F1F;
+    font-size:12px;letter-spacing:.18em;text-transform:uppercase;
+    font-weight:600;border-radius:2px;
+    transition:background var(--t-fast),color var(--t-fast);
+  }
+  .col-tile:hover .shop-now-pill{background:#1F1F1F;color:#fff}
+  @media (max-width:760px){
+    .collage{
+      grid-template-columns: 1fr;
+      grid-template-rows: auto;
+      min-height:auto;
+    }
+    .col-lighting,.col-furniture,.col-decor{ grid-column:1; grid-row:auto; }
+    .col-tile{min-height:240px}
+  }
+
+  /* ============ NEWSLETTER ============ */
+  .news{background:var(--surface);padding:64px 0;text-align:center}
+  .news h2{font-size:28px;color:var(--accent);margin-bottom:8px}
+  .news p{color:var(--text-2);max-width:520px;margin:6px auto 22px}
+  .news-form{
+    max-width:520px;margin:0 auto;
+    display:flex;gap:8px;
+  }
+  .news-form input{
+    flex:1;padding:14px 16px;font-size:15px;
+    border:1px solid var(--hair);background:#fff;border-radius:2px;
+    min-height:48px;
+  }
+  .news-form input:focus{outline:2px solid var(--accent);outline-offset:-1px}
+
+  /* ============ FOOTER — light theme per client screenshot ============ */
+  footer.site-footer{
+    background:#F2F0EC;
+    color:#5B5B58;
+    padding:56px 0 0;
+    border-top:1px solid #E5E2DA;
+  }
+  .ft-grid{
+    display:flex;
+    justify-content:space-between;
+    align-items:flex-start;
+    gap:48px;
+    padding-bottom:48px;
+  }
+  .ft-brand{flex:0 1 auto;max-width:420px}
+  .ft-cols-right{display:flex;gap:64px}
+  @media (max-width:900px){
+    .ft-grid{flex-wrap:wrap;gap:32px}
+    .ft-cols-right{gap:32px;flex-wrap:wrap}
+  }
+  @media (max-width:560px){
+    .ft-cols-right{flex-direction:column;gap:20px}
+  }
+
+  /* Hide the brand wordmark + description per screenshot (only address/phone/email shown) */
+  .ft-brand .script,
+  .ft-brand .sub,
+  .ft-brand > p{display:none}
+
+  .ft-brand .contact{font-size:14.5px;color:#3A3A38;margin:0 0 22px}
+  .ft-brand .contact a{
+    color:#3A3A38;display:flex;align-items:center;gap:12px;
+    margin-bottom:14px;line-height:1.4;
+  }
+  .ft-brand .contact a:hover{color:#1F1F1F}
+  .ft-brand .contact a::before{
+    content:"";width:18px;height:18px;flex-shrink:0;
+    background-position:center;background-repeat:no-repeat;background-size:contain;
+    opacity:.7;
+  }
+  /* SVG icons inlined as data URIs */
+  .ft-brand .contact a[href*="maps"]::before{
+    background-image:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%235B5B58' stroke-width='1.8'><path d='M12 2C8 2 5 5 5 9c0 5 7 13 7 13s7-8 7-13c0-4-3-7-7-7z'/><circle cx='12' cy='9' r='2.5'/></svg>");
+  }
+  .ft-brand .contact a[href^="tel"]::before{
+    background-image:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%235B5B58' stroke-width='1.8'><path d='M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72c.13.95.36 1.88.7 2.78a2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.3-1.27a2 2 0 0 1 2.11-.45c.9.34 1.83.57 2.78.7A2 2 0 0 1 22 16.92z'/></svg>");
+  }
+  .ft-brand .contact a[href^="mailto"]::before{
+    background-image:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%235B5B58' stroke-width='1.8'><rect x='3' y='5' width='18' height='14' rx='2'/><polyline points='3 7 12 13 21 7'/></svg>");
+  }
+
+  .ft-brand .socials{display:flex;gap:14px;margin-top:18px}
+  .ft-brand .socials a{
+    width:32px;height:32px;border:0;border-radius:0;
+    display:flex;align-items:center;justify-content:center;
+    color:#5B5B58;background:transparent;
+    transition:color var(--t-fast);
+  }
+  .ft-brand .socials a:hover{background:transparent;color:#1F1F1F;border:0}
+  .ft-brand .socials svg{width:20px;height:20px}
+
+  .ft-col h4{
+    font-family:var(--f-sans);
+    font-size:14px;letter-spacing:.14em;
+    text-transform:uppercase;color:#3A3A38;
+    font-weight:600;margin-bottom:22px;
+  }
+  .ft-col a{
+    display:block;color:#5B5B58;
+    font-size:14.5px;margin-bottom:14px;padding:0;
+    transition:color var(--t-fast);
+  }
+  .ft-col a:hover{color:#1F1F1F}
+
+  .ft-bottom{
+    margin-top:0;padding:18px 0;
+    border-top:1px solid #E5E2DA;
+    background:#EAE7DF;
+    font-size:13.5px;color:#5B5B58;
+  }
+  .ft-bottom .wrap{
+    display:flex;flex-wrap:wrap;gap:12px;
+    justify-content:space-between;align-items:center;
+  }
+  .ft-bottom a{color:#5B5B58;margin-left:22px}
+  .ft-bottom a:hover{color:#1F1F1F}
+  @media (max-width:560px){
+    .ft-bottom .wrap{flex-direction:column;align-items:flex-start;gap:10px}
+    .ft-bottom a{margin-left:0;margin-right:16px}
+  }
+
+  /* ============ MOBILE DRAWER (#7) ============ */
+  .m-drawer-overlay{
+    position:fixed;inset:0;background:rgba(0,0,0,.4);
+    z-index:99;opacity:0;pointer-events:none;
+    transition:opacity var(--t-med);
+  }
+  .m-drawer-overlay.is-open{opacity:1;pointer-events:auto}
+  .m-drawer{
+    position:fixed;top:0;left:0;bottom:0;
+    width:88vw;max-width:380px;
+    background:#fff;z-index:100;
+    transform:translateX(-100%);
+    transition:transform var(--t-med);
+    display:flex;flex-direction:column;
+    overflow-y:auto;
+  }
+  .m-drawer.is-open{transform:translateX(0)}
+  .m-drawer__head{
+    padding:32px 22px 18px;
+    border-bottom:1px solid var(--hair);
+    text-align:center;
+    position:relative;
+  }
+  /* #7 Brand NAME first, logo image BELOW */
+  .m-drawer__brand{
+    font-family:var(--f-script);font-size:48px;
+    color:var(--accent);line-height:.9;
+  }
+  .m-drawer__sub{
+    font-size:11px;letter-spacing:.32em;font-weight:600;
+    color:var(--accent);margin-top:2px;
+  }
+  .m-drawer__logoimg{
+    margin:16px auto 0;
+    height:40px;width:auto;display:block;
+    opacity:.85;
+  }
+  /* Actual Thomas brand image inside the mobile drawer */
+  .m-drawer__brand-img{
+    height:60px;width:auto;display:block;margin:0 auto;
+  }
+  /* In-drawer brand-switcher pill — Atlas variant (used on Thomas mobile drawer) */
+  .m-drawer__brand-pill{
+    display:inline-flex;align-items:center;gap:10px;
+    padding:9px 18px;
+    margin:18px auto 0;
+    border:1px solid var(--hair);border-radius:999px;
+    background:#fff;
+    font-size:13px;font-weight:600;letter-spacing:.06em;
+    transition:all var(--t-fast);
+  }
+  .m-drawer__brand-pill--atlas{color:#2C2C2C}
+  .m-drawer__brand-pill--atlas:hover{border-color:#2C2C2C;background:#f6f4f0}
+  .m-drawer__brand-pill--atlas .t-mark--atlas{
+    width:22px;height:22px;background:#2C2C2C;color:#fff;border-radius:2px;
+    display:inline-flex;align-items:center;justify-content:center;
+    font-family:var(--f-script);font-size:18px;line-height:1;padding-bottom:2px;
+  }
+  .m-drawer__close{
+    position:absolute;top:14px;right:14px;
+    width:38px;height:38px;border-radius:999px;
+    display:flex;align-items:center;justify-content:center;
+    color:var(--text);
+  }
+  .m-drawer__close:hover{background:var(--surface-2)}
+  /* Cleaner mobile drawer spacing per client notes */
+  .m-drawer nav{padding:8px 0 24px}
+  .m-drawer nav a,
+  .m-drawer nav .m-drawer__brand-switch{
+    display:flex;align-items:center;gap:18px;width:100%;
+    text-align:left;padding:14px 22px;
+    font-size:15.5px;color:var(--text);font-weight:500;
+    border-bottom:1px solid #f0efeb;
+    min-height:52px;
+  }
+  .m-drawer nav a > svg{
+    width:22px;height:22px;flex-shrink:0;color:var(--text-2);
+  }
+  .m-drawer nav a:hover{background:var(--surface)}
+  .m-drawer__brand-switch{
+    margin:18px 18px 6px;
+    padding:14px 18px;
+    background:var(--surface-2);
+    border-radius:var(--r-card);
+    border-bottom:none;
+    display:flex;align-items:center;justify-content:space-between;
+    color:var(--accent);font-weight:600;
+    text-transform:uppercase;letter-spacing:.14em;font-size:13px;
+  }
+  .menu-section-label{
+    font-size:11px;letter-spacing:.24em;text-transform:uppercase;
+    color:var(--text-3);padding:22px 22px 10px;
+    margin-top:4px;
+  }
+  .m-drawer nav a:first-of-type{border-top:0}
+
+  /* utility */
+  .hide-desktop{display:none}
+  @media (max-width:900px){.hide-mobile{display:none}.hide-desktop{display:inline-flex}}
+
+  /* change-log strip */
+  .change-log{
+    background:#0f0f0f;color:#9d9b94;
+    padding:24px 0;font-size:12px;line-height:1.6;
+  }
+  .change-log .wrap{font-family:ui-monospace,Menlo,Consolas,monospace}
+  .change-log b{color:#fff}
+
+  *:focus-visible{outline:3px solid var(--accent);outline-offset:2px}
+</style>
+</head>
+<body>
+
+<!-- Announcement bar removed per client request -->
+
+<!-- Inline search overlay (opens when search icon is clicked) -->
+<div class="search-overlay" id="searchOverlay" role="dialog" aria-label="Search">
+  <div class="search-bar">
+    <div class="search-input-wrap">
+      <svg class="si-mag" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="11" cy="11" r="7"/><line x1="21" y1="21" x2="16.5" y2="16.5"/></svg>
+      <input id="searchOverlayInput" type="search" placeholder="Search..." aria-label="Search" />
+      <button class="search-by-image" type="button" aria-label="Search by image" title="Search by image"
+              onclick="document.getElementById('imgSearchInput').click()">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
+          <path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/>
+          <circle cx="12" cy="13" r="4"/>
+        </svg>
+      </button>
+    </div>
+    <button class="search-close" type="button" aria-label="Close search" onclick="closeSearch()">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+    </button>
+  </div>
+</div>
+
+<!-- ============ HEADER — 3-tier layout per client screenshot ============ -->
+<header class="site-header">
+
+  <!-- TIER 1: Top strip — both brand switchers removed per client; strip kept empty -->
+  <div class="hdr-top-strip">
+    <div class="wrap"></div>
+  </div>
+
+  <!-- TIER 2: Main header row -->
+  <div class="hdr-main">
+    <div class="wrap">
+      <div class="hdr-row">
+
+        <div class="hdr-left">
+          <button class="icon-btn hamburger hide-desktop" aria-label="Open menu" onclick="openDrawer()">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/></svg>
+          </button>
+          <!-- Thomas brand-switcher pill relocated to bottom nav row -->
+        </div>
+
+        <!-- CENTER: Thomas Lighting brand logo -->
+        <a class="hdr-logo hdr-logo--image" href="#" aria-label="Thomas Lighting">
+          <img src="assets/thomas-logo.png" alt="Thomas Lighting" />
+        </a>
+
+        <div class="hdr-right">
+          <button class="icon-btn" aria-label="Search" onclick="openSearch()">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="11" cy="11" r="7"/><line x1="21" y1="21" x2="16.5" y2="16.5"/></svg>
+          </button>
+          <input type="file" id="imgSearchInput" accept="image/*" hidden
+                 onchange="if(this.files[0]) alert('Searching with image: ' + this.files[0].name);" />
+          <a class="icon-btn" href="login-thomas.html" aria-label="Wishlist" data-mobile-hide>
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>
+          </a>
+          <a class="icon-btn" href="login-thomas.html" aria-label="Account">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+          </a>
+          <a class="icon-btn" id="cartBtn" href="login-thomas.html" aria-label="Cart">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="9" cy="21" r="1"/><circle cx="20" cy="21" r="1"/><path d="M1 1h4l2.7 13.4a2 2 0 0 0 2 1.6h9.7a2 2 0 0 0 2-1.6L23 6H6"/></svg>
+            <span class="cart-badge">0</span>
+          </a>
+        </div>
+
+      </div>
+    </div>
+  </div>
+
+  <!-- TIER 3: Bottom nav row — Thomas pill on LEFT (left of Featured Collections), nav links centered -->
+  <div class="hdr-nav">
+    <div class="wrap">
+      <!-- Atlas brand-switcher pill positioned to the left of Featured Collections -->
+      <a class="hdr-brand-pill hdr-brand-pill--nav hdr-brand-pill--atlas hide-mobile" href="index.html" aria-label="Switch to Atlas Lighting and Home">
+        <span class="t-mark t-mark--atlas">A</span>
+        <span>Atlas Lighting &amp; Home</span>
+      </a>
+
+      <!-- Atlas nav hidden by default on Thomas site -->
+      <nav class="nav hide-mobile atlas-nav" id="atlasNav" aria-label="Primary (Atlas)" style="display:none">
+        <a href="#fc">Featured Collections</a>
+        <a href="#products">Featured Products</a>
+        <a href="#shop">Shop</a>
+        <a href="#contact">Contact Us</a>
+      </nav>
+      <!-- Thomas-mode nav -->
+      <nav class="nav hide-mobile thomas-nav" id="thomasNav" aria-label="Primary">
+        <div class="nav-item">
+          <a href="#">Indoor Lighting <svg class="chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg></a>
+          <div class="dropdown">
+            <a href="collection.html?category=Chandeliers">Chandeliers</a>
+            <a href="collection.html?category=Pendants">Pendants</a>
+            <a href="collection.html?category=Vanity">Vanity</a>
+            <a href="collection.html?category=Wall%20Sconces">Wall Sconces</a>
+            <a href="collection.html?category=Flush%20Mount">Flush Mount</a>
+            <a href="collection.html?category=Ceiling%20Fans">Ceiling Fans</a>
+          </div>
+        </div>
+        <div class="nav-item">
+          <a href="#">Outdoor Lighting <svg class="chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg></a>
+          <div class="dropdown">
+            <a href="collection.html?category=Wall%20Lanterns">Wall Lanterns</a>
+            <a href="collection.html?category=Post%20Lanterns">Post Lanterns</a>
+            <a href="collection.html?category=Outdoor%20Pendants">Outdoor Pendants</a>
+            <a href="collection.html?category=Landscape%20Lighting">Landscape Lighting</a>
+          </div>
+        </div>
+        <div class="nav-item">
+          <a href="#fc">Collections <svg class="chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg></a>
+          <div class="dropdown">
+            <a href="collection.html?category=Tia">Tia</a>
+            <a href="collection.html?category=Conway">Conway</a>
+            <a href="collection.html?category=Pittman">Pittman</a>
+            <a href="collection.html?category=Homestead">Homestead</a>
+            <a href="collection.html?category=West%20End">West End</a>
+            <a href="collection.html?category=Williamsport">Williamsport</a>
+          </div>
+        </div>
+        <a href="#contact">Contact Us</a>
+      </nav>
+
+      <!-- Right-side spacer so nav stays visually centered -->
+      <span class="hdr-nav-spacer hide-mobile" aria-hidden="true"></span>
+    </div>
+  </div>
+
+</header>
+
+<!-- ============ HERO (#9 banner box BOTTOM) ============ -->
+<section class="hero">
+  <div class="hero-slider" id="heroSlider">
+    <div class="hero-track" id="heroTrack">
+
+      <article class="hero-slide" aria-roledescription="slide">
+        <div class="hero-slide__img" role="img" aria-label="Chandelier in a classic interior"></div>
+        <div class="hero-slide__deco"></div>
+        <div class="hero-card">
+          <h2 class="hero-card__title">Light that lives beautifully</h2>
+          <p class="hero-card__body">Simple forms, warm finishes, and effortless function – lighting that enhances every moment of your day with understated style.</p>
+          <a href="#shop" class="btn">Discover</a>
+        </div>
+      </article>
+
+      <article class="hero-slide" aria-roledescription="slide">
+        <div class="hero-slide__img" role="img" aria-label="Chandelier in a classic interior"></div>
+        <div class="hero-slide__deco"></div>
+        <div class="hero-card">
+          <h2 class="hero-card__title">Light that lives beautifully</h2>
+          <p class="hero-card__body">Simple forms, warm finishes, and effortless function – lighting that enhances every moment of your day with understated style.</p>
+          <a href="#shop" class="btn">Discover</a>
+        </div>
+      </article>
+
+      <article class="hero-slide" aria-roledescription="slide">
+        <div class="hero-slide__img" role="img" aria-label="Chandelier in a classic interior"></div>
+        <div class="hero-slide__deco"></div>
+        <div class="hero-card">
+          <h2 class="hero-card__title">Light that lives beautifully</h2>
+          <p class="hero-card__body">Simple forms, warm finishes, and effortless function – lighting that enhances every moment of your day with understated style.</p>
+          <a href="#shop" class="btn">Discover</a>
+        </div>
+      </article>
+
+    </div>
+
+    <button class="hero-arrow prev" id="heroPrev" aria-label="Previous slide">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="15 18 9 12 15 6"/></svg>
+    </button>
+    <button class="hero-arrow next" id="heroNext" aria-label="Next slide">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="9 18 15 12 9 6"/></svg>
+    </button>
+    <button class="hero-pause" id="heroPause" aria-label="Pause carousel">
+      <svg viewBox="0 0 24 24" fill="currentColor"><rect x="6" y="5" width="4" height="14"/><rect x="14" y="5" width="4" height="14"/></svg>
+    </button>
+    <div class="hero-dots" id="heroDots" role="tablist"></div>
+  </div>
+</section>
+
+<!-- ============ FEATURED COLLECTIONS (#13 renamed, #17 six cards, #12 in-box+shading, #14 small Shop Now) ============ -->
+<section class="sec" id="fc">
+  <div class="wrap">
+    <div class="sec-head">
+      <!-- "Explore Category" eyebrow removed per client notes -->
+      <h2>Featured Collections</h2>
+      <p>Curated lighting and home pieces — six collections, hand-selected each season.</p>
+    </div>
+
+    <div class="fc-grid">
+      <!-- Tia: bowl pendant + chandelier combo -->
+      <a class="cat-tile" href="collection.html">
+        <div class="cat-tile__body">
+          <h3 class="cat-tile__title">Tia</h3>
+          <span class="shop-now">Shop Now
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
+          </span>
+        </div>
+        <div class="cat-tile__media">
+          <img src="assets/collections/tia.png" alt="Tia collection" loading="lazy">
+        </div>
+      </a>
+
+      <!-- Conway: large pendant -->
+      <a class="cat-tile" href="collection.html">
+        <div class="cat-tile__body">
+          <h3 class="cat-tile__title">Conway</h3>
+          <span class="shop-now">Shop Now
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
+          </span>
+        </div>
+        <div class="cat-tile__media">
+          <img src="assets/collections/conway.png" alt="Conway collection" loading="lazy">
+        </div>
+      </a>
+
+      <!-- Pittman: flush mount + chandelier -->
+      <a class="cat-tile" href="collection.html">
+        <div class="cat-tile__body">
+          <h3 class="cat-tile__title">Pittman</h3>
+          <span class="shop-now">Shop Now
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
+          </span>
+        </div>
+        <div class="cat-tile__media">
+          <img src="assets/collections/pittman.png" alt="Pittman collection" loading="lazy">
+        </div>
+      </a>
+
+      <!-- Homestead: 3 vanity light variants -->
+      <a class="cat-tile" href="collection.html">
+        <div class="cat-tile__body">
+          <h3 class="cat-tile__title">Homestead</h3>
+          <span class="shop-now">Shop Now
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
+          </span>
+        </div>
+        <div class="cat-tile__media">
+          <img src="assets/collections/homestead.png" alt="Homestead collection" loading="lazy">
+        </div>
+      </a>
+
+      <!-- West End: cage chandeliers -->
+      <a class="cat-tile" href="collection.html">
+        <div class="cat-tile__body">
+          <h3 class="cat-tile__title">West End</h3>
+          <span class="shop-now">Shop Now
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
+          </span>
+        </div>
+        <div class="cat-tile__media">
+          <img src="assets/collections/west-end.png" alt="West End collection" loading="lazy">
+        </div>
+      </a>
+
+      <!-- Williamsport: orb + lantern chandeliers -->
+      <a class="cat-tile" href="collection.html">
+        <div class="cat-tile__body">
+          <h3 class="cat-tile__title">Williamsport</h3>
+          <span class="shop-now">Shop Now
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
+          </span>
+        </div>
+        <div class="cat-tile__media">
+          <img src="assets/collections/williamsport.png" alt="Williamsport collection" loading="lazy">
+        </div>
+      </a>
+
+    </div>
+  </div>
+</section>
+
+<!-- ============ FEATURED PRODUCTS (#15 no microtext, #16 4/2 grid, #24 finish&material, #25 no price for guests) ============ -->
+<section class="sec" id="products" style="background:var(--surface);padding-top:64px">
+  <div class="wrap">
+    <div class="sec-head">
+      <div class="eyebrow">Hand-picked</div>
+      <h2>Featured Products</h2>
+      <p>Eight signature pieces showcased four at a time — refreshed each season.</p>
+    </div>
+
+    <div class="featured-grid">
+
+      <article class="pcard">
+        <div class="pcard__media">
+          <button class="pcard__wish" aria-label="Save to wishlist"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg></button>
+          <svg viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="xMidYMid meet">
+            <g fill="none" stroke="#5b544a" stroke-width="1.8">
+              <line x1="100" y1="14" x2="100" y2="56"/>
+              <circle cx="100" cy="62" r="6" fill="#5b544a"/>
+              <line x1="100" y1="68" x2="100" y2="100"/>
+              <ellipse cx="100" cy="106" rx="44" ry="8" fill="#cfc8b9"/>
+              <line x1="70" y1="110" x2="70" y2="138"/><circle cx="70" cy="146" r="12" fill="#e6dfd0"/>
+              <line x1="100" y1="110" x2="100" y2="150"/><circle cx="100" cy="158" r="12" fill="#e6dfd0"/>
+              <line x1="130" y1="110" x2="130" y2="138"/><circle cx="130" cy="146" r="12" fill="#e6dfd0"/>
+            </g>
+          </svg>
+        </div>
+        <div class="pcard__body">
+          <div class="pcard__sku">CL11046-BS</div>
+          <h3 class="pcard__title">Starburst 9-Light Chandelier</h3>
+          <!-- #24 finish & material concat -->
+          <div class="pcard__meta">Brushed Silver · Hand-Blown Glass</div>
+          <!-- #25 hidden for guests -->
+          <div class="pcard__price">$1,248 <small>each</small></div>
+          <div class="pcard__cta">
+            <button class="pcard__add">Add to Cart</button>
+          </div>
+        </div>
+      </article>
+
+      <article class="pcard">
+        <div class="pcard__media">
+          <button class="pcard__wish" aria-label="Save to wishlist"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg></button>
+          <svg viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="xMidYMid meet">
+            <g fill="none" stroke="#2b2b2b" stroke-width="2">
+              <rect x="50" y="62" width="100" height="12" rx="2" fill="#3a3a3a"/>
+              <circle cx="80" cy="94" r="14" fill="#fff" stroke="#2b2b2b"/>
+              <circle cx="120" cy="94" r="14" fill="#fff" stroke="#2b2b2b"/>
+            </g>
+          </svg>
+        </div>
+        <div class="pcard__body">
+          <div class="pcard__sku">WL11630-BK</div>
+          <h3 class="pcard__title">Boudreau 2-Light Vanity</h3>
+          <div class="pcard__meta">Matte Black · Frosted Opal Glass</div>
+          <div class="pcard__price">$386 <small>each</small></div>
+          <div class="pcard__cta">
+            <button class="pcard__add">Add to Cart</button>
+          </div>
+        </div>
+      </article>
+
+      <article class="pcard">
+        <div class="pcard__media">
+          <button class="pcard__wish" aria-label="Save to wishlist"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg></button>
+          <svg viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="xMidYMid meet">
+            <g fill="none" stroke="#7a6a52" stroke-width="3"><circle cx="100" cy="100" r="72" fill="#f6f1e6"/><circle cx="100" cy="100" r="60" fill="#fff" stroke="#bba887"/></g>
+          </svg>
+        </div>
+        <div class="pcard__body">
+          <div class="pcard__sku">MI11026-01</div>
+          <h3 class="pcard__title">Halston Round Wall Mirror</h3>
+          <div class="pcard__meta">Antique Brass · Beveled Glass</div>
+          <div class="pcard__price">$298 <small>each</small></div>
+          <div class="pcard__cta">
+            <button class="pcard__add">Add to Cart</button>
+          </div>
+        </div>
+      </article>
+
+      <article class="pcard">
+        <div class="pcard__media">
+          <button class="pcard__wish" aria-label="Save to wishlist"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg></button>
+          <svg viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="xMidYMid meet">
+            <g fill="none" stroke="#5b544a" stroke-width="2">
+              <ellipse cx="100" cy="78" rx="38" ry="20" fill="#e6dfd0"/>
+              <rect x="92" y="98" width="16" height="68" fill="#7a6a52"/>
+              <ellipse cx="100" cy="168" rx="34" ry="6" fill="#7a6a52"/>
+            </g>
+          </svg>
+        </div>
+        <div class="pcard__body">
+          <div class="pcard__sku">TL30210-AB</div>
+          <h3 class="pcard__title">Vavda Textured Table Lamp</h3>
+          <div class="pcard__meta">Aged Brass · Linen Drum Shade</div>
+          <div class="pcard__price">$214 <small>each</small></div>
+          <div class="pcard__cta">
+            <button class="pcard__add">Add to Cart</button>
+          </div>
+        </div>
+      </article>
+
+    </div>
+  </div>
+</section>
+
+<!-- Category Collage section removed from Thomas site per client request -->
+
+<!-- ============ NEWSLETTER ============ -->
+<section class="news">
+  <div class="wrap">
+    <h2>Subscribe to our newsletter</h2>
+    <p>New arrivals, designer favourites, and trade updates — straight to your inbox.</p>
+    <form class="news-form" onsubmit="event.preventDefault();alert('Thanks! You are subscribed (demo).')">
+      <input type="email" required placeholder="your@email.com" aria-label="Email address">
+      <button class="btn" type="submit">Subscribe</button>
+    </form>
+  </div>
+</section>
+
+<!-- ============ FOOTER (#19, #20) ============ -->
+<footer class="site-footer" id="contact">
+  <div class="wrap">
+    <div class="ft-grid">
+
+      <div class="ft-brand">
+        <div class="script">Thomas</div>
+        <div class="sub">LIGHTING</div>
+        <p>Timeless lighting for the modern home. A sister brand of Atlas Lighting &amp; Home.</p>
+        <div class="contact">
+          <a href="https://maps.app.goo.gl/2jRZHGWsekFx4moc6">1473 Yorkhouse Road, Rabun Gap, GA 30568</a>
+          <a href="tel:+7624028527">(762) 40-ATLAS · (762) 402-8527</a>
+          <a href="mailto:sales@cncptatlaslighting.wizcommerce.com">sales@cncptatlaslighting.wizcommerce.com</a>
+        </div>
+        <div class="socials">
+          <a href="https://www.facebook.com/atlaslightingandhome" aria-label="Facebook"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M18 2h-3a5 5 0 0 0-5 5v3H7v4h3v8h4v-8h3l1-4h-4V7a1 1 0 0 1 1-1h3z"/></svg></a>
+          <a href="https://www.instagram.com/atlaslightingandhome/" aria-label="Instagram"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="2" y="2" width="20" height="20" rx="5"/><circle cx="12" cy="12" r="4"/><circle cx="17.5" cy="6.5" r="1.2" fill="currentColor"/></svg></a>
+          <a href="https://www.pinterest.com/AtlasLightingAndHome/" aria-label="Pinterest"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 2a10 10 0 0 0-3.6 19.3c-.1-.8-.2-2 0-2.9.2-.8 1.2-5 1.2-5s-.3-.6-.3-1.5c0-1.4.8-2.4 1.8-2.4.9 0 1.3.7 1.3 1.5 0 .9-.6 2.3-.9 3.6-.3 1 .5 1.9 1.5 1.9 1.8 0 3.1-1.9 3.1-4.6 0-2.4-1.7-4.1-4.2-4.1-2.9 0-4.6 2.2-4.6 4.4 0 .9.3 1.8.8 2.3.1.1.1.2.1.3l-.3 1.3c-.1.2-.2.3-.4.2-1.5-.7-2.4-2.9-2.4-4.6 0-3.8 2.7-7.2 7.9-7.2 4.1 0 7.3 3 7.3 6.9 0 4.1-2.6 7.4-6.2 7.4-1.2 0-2.4-.6-2.8-1.4l-.7 2.9c-.3 1-1 2.4-1.5 3.2A10 10 0 1 0 12 2z"/></svg></a>
+          <a href="https://www.linkedin.com/company/atlas-lighting-home/" aria-label="LinkedIn"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M4 4h4v4H4zm0 6h4v10H4zm6 0h4v2c.6-1.2 2-2.3 4-2.3 3 0 4 2 4 5V20h-4v-5c0-1.4-.3-2.6-2-2.6s-2 1.2-2 2.6V20h-4z"/></svg></a>
+        </div>
+      </div>
+
+      <div class="ft-cols-right">
+        <div class="ft-col">
+          <h4>Products</h4>
+          <a href="#">Lighting</a>
+          <a href="#">Decor</a>
+          <a href="#">Furniture</a>
+          <a href="#">Thomas Lighting</a>
+          <a href="https://elkhomestore.com">Opportunity Buys</a>
+        </div>
+
+        <div class="ft-col">
+          <h4>Resources</h4>
+          <a href="#">Catalogs</a>
+          <a href="#">Dealer Locator</a>
+          <a href="#">Request Account</a>
+          <a href="#">Blogs</a>
+          <a href="#">Thomas Lighting</a>
+        </div>
+
+        <div class="ft-col">
+          <h4>About</h4>
+          <a href="#">Contact Us</a>
+          <a href="#">About Us</a>
+          <a href="#">Privacy Policy</a>
+          <a href="#">Terms &amp; Conditions</a>
+          <a href="#">Accessibility</a>
+        </div>
+      </div>
+
+    </div>
+
+  </div>
+  <div class="ft-bottom">
+    <div class="wrap">
+      <span>Powered by WizCommerce. All rights reserved.</span>
+      <span>
+        <a href="#">Privacy Policy</a>
+        <a href="#">Terms &amp; Conditions</a>
+        <a href="#">Accessibility</a>
+      </span>
+    </div>
+  </div>
+</footer>
+
+<!-- Change-log strip removed per client request -->
+
+<!-- ============ MOBILE DRAWER (#7) ============ -->
+<div class="m-drawer-overlay" id="drawerOverlay" onclick="closeDrawer()"></div>
+<aside class="m-drawer" id="drawer" role="dialog" aria-label="Site menu">
+  <div class="m-drawer__head">
+    <button class="m-drawer__close" aria-label="Close menu" onclick="closeDrawer()">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+    </button>
+    <!-- Actual Thomas brand logo image -->
+    <img class="m-drawer__brand-img" src="assets/thomas-logo.png" alt="Thomas Lighting" />
+
+    <!-- Brand switcher pill (same look as desktop) — placed just below the brand logo -->
+    <a class="m-drawer__brand-pill m-drawer__brand-pill--atlas" href="index.html">
+      <span class="t-mark t-mark--atlas">A</span>
+      <span>Atlas Lighting &amp; Home</span>
+    </a>
+  </div>
+
+  <nav aria-label="Mobile primary">
+    <a href="#"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M4 4h13a3 3 0 0 1 3 3v13a3 3 0 0 0-3-3H4z"/><line x1="4" y1="4" x2="4" y2="20"/></svg>Catalogs</a>
+    <a href="#"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg>Categories</a>
+    <a href="#"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><circle cx="12" cy="12" r="3"/><circle cx="12" cy="4" r="2"/><circle cx="12" cy="20" r="2"/><circle cx="4" cy="12" r="2"/><circle cx="20" cy="12" r="2"/></svg>Collections</a>
+    <a href="#about"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M3 9l2-5h14l2 5v2a3 3 0 0 1-6 0 3 3 0 0 1-6 0 3 3 0 0 1-6 0z"/><path d="M5 11v9h14v-9"/></svg>About Us</a>
+    <a href="#contact"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72c.13.95.36 1.88.7 2.78a2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.3-1.27a2 2 0 0 1 2.11-.45c.9.34 1.83.57 2.78.7A2 2 0 0 1 22 16.92z"/></svg>Contact Us</a>
+    <a href="#"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M12 2C8 2 5 5 5 9c0 5 7 13 7 13s7-8 7-13c0-4-3-7-7-7z"/><circle cx="12" cy="9" r="2.5"/></svg>Dealer Locator</a>
+    <a href="#"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M15 3h4a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-4"/><polyline points="10 17 15 12 10 7"/><line x1="15" y1="12" x2="3" y2="12"/></svg>Sign In / Sign Up</a>
+
+    <!-- Brand-switcher relocated to drawer head (just below brand logo) -->
+  </nav>
+</aside>
+
+<script>
+  /* ============ Inline search overlay ============ */
+  function openSearch(){
+    const el = document.getElementById('searchOverlay');
+    el.classList.add('is-open');
+    setTimeout(()=>{ document.getElementById('searchOverlayInput').focus(); }, 80);
+  }
+  function closeSearch(){
+    document.getElementById('searchOverlay').classList.remove('is-open');
+  }
+  document.addEventListener('keydown', (e)=>{
+    if(e.key === 'Escape') closeSearch();
+  });
+
+  /* ============ MOBILE DRAWER (#7) ============ */
+  function openDrawer(){
+    document.getElementById('drawer').classList.add('is-open');
+    document.getElementById('drawerOverlay').classList.add('is-open');
+    document.body.style.overflow='hidden';
+  }
+  function closeDrawer(){
+    document.getElementById('drawer').classList.remove('is-open');
+    document.getElementById('drawerOverlay').classList.remove('is-open');
+    document.body.style.overflow='';
+  }
+
+  /* ============ BRAND SWITCH — toggles which nav (Atlas/Thomas) is visible ============ */
+  function switchBrand(brand){
+    const atlasNav = document.getElementById('atlasNav');
+    const thomasNav = document.getElementById('thomasNav');
+    if(brand === 'thomas'){
+      if(atlasNav) atlasNav.style.display = 'none';
+      if(thomasNav) thomasNav.style.display = 'flex';
+    } else {
+      if(atlasNav) atlasNav.style.display = 'flex';
+      if(thomasNav) thomasNav.style.display = 'none';
+    }
+    // close the dropdown
+    const el = document.getElementById('brandSwitcher');
+    if(el) el.classList.remove('is-open');
+  }
+
+  /* ============ BRAND SWITCHER DROPDOWN (#5) ============ */
+  function toggleBrandSwitcher(e){
+    e.stopPropagation();
+    const el = document.getElementById('brandSwitcher');
+    el.classList.toggle('is-open');
+    const btn = el.querySelector('.brand-switcher__btn');
+    btn.setAttribute('aria-expanded', el.classList.contains('is-open'));
+  }
+  document.addEventListener('click', (e)=>{
+    const el = document.getElementById('brandSwitcher');
+    if(!el) return;
+    if(!el.contains(e.target)) el.classList.remove('is-open');
+  });
+
+  /* Featured Collection tiles -> open collection.html with the category title */
+  document.querySelectorAll('.cat-tile').forEach(tile => {
+    tile.addEventListener('click', (e) => {
+      const titleEl = tile.querySelector('.cat-tile__title');
+      if (!titleEl) return;
+      e.preventDefault();
+      const cat = encodeURIComponent(titleEl.textContent.trim());
+      window.location.href = 'collection.html?category=' + cat;
+    });
+  });
+
+  /* Make Featured Product cards clickable -> open PDP */
+  document.querySelectorAll('.pcard').forEach(card => {
+    card.style.cursor = 'pointer';
+    card.addEventListener('click', (e) => {
+      // Inner buttons (wishlist etc.) should not navigate
+      if (e.target.closest('button, a')) return;
+      window.location.href = 'pdp.html';
+    });
+  });
+
+  /* ============ HERO CAROUSEL ============ */
+  (function(){
+    const track = document.getElementById('heroTrack');
+    if(!track) return;
+    const slides = track.children;
+    const dotsBox = document.getElementById('heroDots');
+    const prev = document.getElementById('heroPrev');
+    const next = document.getElementById('heroNext');
+    const pause = document.getElementById('heroPause');
+    let i = 0, timer = null, paused = false;
+    const reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+    for(let k=0;k<slides.length;k++){
+      const b = document.createElement('button');
+      b.setAttribute('aria-label', 'Go to slide '+(k+1));
+      b.addEventListener('click', ()=>{ go(k); resetTimer(); });
+      dotsBox.appendChild(b);
+    }
+    function go(n){
+      i = (n + slides.length) % slides.length;
+      track.style.transform = 'translateX(-'+(i*100)+'%)';
+      Array.from(dotsBox.children).forEach((d,k)=>d.classList.toggle('active', k===i));
+    }
+    function resetTimer(){
+      if(timer) clearInterval(timer);
+      if(!paused && !reduced) timer = setInterval(()=>go(i+1), 6500);
+    }
+    prev.addEventListener('click', ()=>{ go(i-1); resetTimer(); });
+    next.addEventListener('click', ()=>{ go(i+1); resetTimer(); });
+    pause.addEventListener('click', ()=>{
+      paused = !paused;
+      pause.innerHTML = paused
+        ? '<svg viewBox="0 0 24 24" fill="currentColor"><polygon points="6,4 20,12 6,20"/></svg>'
+        : '<svg viewBox="0 0 24 24" fill="currentColor"><rect x="6" y="5" width="4" height="14"/><rect x="14" y="5" width="4" height="14"/></svg>';
+      pause.setAttribute('aria-label', paused ? 'Play carousel' : 'Pause carousel');
+      resetTimer();
+    });
+    go(0); resetTimer();
+  })();
+</script>
+</body>
+</html>
